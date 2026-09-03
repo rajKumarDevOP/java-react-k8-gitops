@@ -198,7 +198,7 @@ Vite environment variables prefixed with `VITE_` are evaluated during the build.
 For the UAT environment:
 
 ```text
-VITE_API_BASE_URL=https://uat.svkm.ac.in/feedbackapi
+VITE_API_BASE_URL=https://domain/feedbackapi
 ```
 
 This variable is supplied **before `npm run build`**.
@@ -206,7 +206,7 @@ This variable is supplied **before `npm run build`**.
 Example:
 
 ```dockerfile
-ENV VITE_API_BASE_URL=https://uat.svkm.ac.in/feedbackapi
+ENV VITE_API_BASE_URL=https://domain/feedbackapi
 
 RUN npm run build
 ```
@@ -526,7 +526,7 @@ The important point is that the backend `proxy_pass` preserves `/feedbackapi` so
 ## Frontend
 
 ```text
-https://uat.svkm.ac.in/feedback/
+https://domain/feedback/
                 ↓
           External Nginx
                 ↓
@@ -540,7 +540,7 @@ https://uat.svkm.ac.in/feedback/
 ## Backend API
 
 ```text
-https://uat.svkm.ac.in/feedbackapi/login
+https://domain/feedbackapi/login
                 ↓
           External Nginx
                 ↓
@@ -596,7 +596,7 @@ Example ConfigMap:
 data:
   SERVER_PORT: "8088"
   DB_URL: "jdbc:mysql://<database-host>:3306/usermanagement"
-  CORS_ALLOWED_ORIGINS: "https://uat.svkm.ac.in"
+  CORS_ALLOWED_ORIGINS: "https://domain"
 ```
 
 Sensitive credentials are stored in Kubernetes Secrets rather than directly inside the Deployment manifest.
