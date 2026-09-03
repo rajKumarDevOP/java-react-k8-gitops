@@ -41,7 +41,7 @@ spec:
       containers:
         - name: feedback-frontend
 
-          image: 925963414980.dkr.ecr.ap-south-1.amazonaws.com/feedback/frontend:image
+          image: 925963414980.dkr.ecr.ap-south-1.amazonaws.com/feedback/frontend:49f46cde1edeca41521fe40876521bb58ff4eb83
           imagePullPolicy: IfNotPresent
 
           ports:
@@ -118,7 +118,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 
 metadata:
-  name: feedback-ingress
+  name: feedback-frontend-ingress
   namespace: feedback
 
 spec:
