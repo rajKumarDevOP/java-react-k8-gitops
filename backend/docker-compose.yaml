@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+
+ feedback-backend:
+    image: feedback-backend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: feedback-backend
+    restart: always
+    ports:
+      - "8081:8088"
+    volumes:
+      - /data/logs/feedback-backend/logs:/app/logs
+      - /etc/localtime:/etc/localtime/:ro
+   #   - ./backend/uploads:/app/uploads
+    environment:
+         TZ: Asia/Kolkata
+   
+    healthcheck:
+         test:
+            [
+             "CMD-SHELL",
+             "wget --no-verbose --tries=1 --spider http://127.0.0.1:8088 || exit 1"
+            ]
+         interval: 30s
+         timeout: 5s
+         retries: 3
+         start_period: 15s
+
+    logging:
+          driver: json-file
+          options:
+            max-size: "5m"
+            max-file: "5"
+    security_opt:
+            - no-new-privileges:true
+
+    networks:
+     - feedback
+
+
+networks:
+  feedback:
+    driver: "bridge"
