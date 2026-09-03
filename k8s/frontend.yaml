@@ -1,0 +1,137 @@
+###############################
+# Feedback Frontend Deployment
+###############################
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: feedback-frontend
+  namespace: feedback
+
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+
+  selector:
+    matchLabels:
+      app: feedback-frontend
+
+  template:
+    metadata:
+      labels:
+        app: feedback-frontend
+
+    spec:
+      terminationGracePeriodSeconds: 30
+
+      imagePullSecrets:
+        - name: ecr-secret
+
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+
+      containers:
+        - name: feedback-frontend
+
+          image: 925963414980.dkr.ecr.ap-south-1.amazonaws.com/feedback/frontend:image
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "300m"
+              memory: "512Mi"
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - sh
+                  - -c
+                  - "sleep 10"
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+
+---
+###############################
+# Feedback Frontend Service
+###############################
+
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: feedback-frontend-service
+  namespace: feedback
+
+spec:
+  selector:
+    app: feedback-frontend
+
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+
+  type: ClusterIP
+
+
+---
+###############################
+# Feedback Frontend Ingress
+###############################
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: feedback-ingress
+  namespace: feedback
+
+spec:
+  ingressClassName: traefik
+
+  rules:
+    - host: uat.svkm.ac.in
+      http:
+        paths:
+          - path: /feedback
+            pathType: Prefix
+            backend:
+              service:
+                name: feedback-frontend-service
+                port:
+                  number: 80
